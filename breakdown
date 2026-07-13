@@ -9,10 +9,9 @@ Duration	~110 seconds	2,640+ frames; impossible to process all pairs at once in 
 Car body	Bottom 40–50% of every frame	Static object confuses the model into building a 'red cylinder' artefact along the trajectory
 Scale	Unknown absolute scale	Monocular video has no depth reference; scale is ambiguous without intervention
 Dynamic objects	Other F1 cars visible in ~30% of frames	Moving objects corrupt the static scene reconstruction if not handled
-Intrinsics	Unknown focal length / distortion	Camera matrix must be estimated rather than provided
+Intrinsics	Unknown focal length/distortion	Camera matrix must be estimated rather than provided
 
-⚠  The raw video cannot be processed directly. Every single property in the table above is a failure mode for the reconstruction model if left unaddressed. The model would either crash (OOM), produce a shapeless blob, or reconstruct a phantom car body instead of the track.
-The fundamental mismatch — what the model expects
+
 DUSt3R (the reconstruction model) is designed to receive pairs of frames where: (a) the frame resolution is approximately 512 px on the longest side, (b) the content of the frame is entirely scene geometry with no static foreground object permanently blocking half the view, and (c) consecutive frames have manageable inter-frame displacement. The raw video violates all three conditions.
 1.2  The Preprocessing Pipeline — Step by Step
 Step 1 — Trim to the useful segment
@@ -212,8 +211,3 @@ Stitching	88 chunk clouds	Global cloud	Millions of points total
 Voxel downsample	Global cloud	Final point cloud	~500k–2M unique points
 Camera path	88 sets of poses	Racing line PLY	88×20 = 1760 poses
 
-3.5  Final Output Description
-The model produces two final outputs saved as PLY (polygon file format) point cloud files:
-●	vroom_global.ply — The 3D point cloud of the Monaco circuit. Points are coloured by confidence — red = high confidence (road surface, barriers), green = medium, approaching zero = noise. When viewed from above, the point cloud shows the track layout matching the known Monaco circuit map.
-●	vroom_camera_path.ply — The recovered camera trajectory — one 3D point per frame, coloured blue. This is the racing line: the optimal path through each corner that minimises lap time. The path visibly follows the geometric racing line (late braking, apex, early exit) through well-reconstructed corners.
-✓  Final output: a navigable 3D model of the track and a verified racing line, derived entirely from monocular onboard video with no external sensors. Individual chunk alignment losses consistently below 0.010, indicating high-quality local reconstruction throughout.
